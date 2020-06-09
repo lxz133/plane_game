@@ -153,6 +153,7 @@ def main():
     #每30秒发放一个补给包
     bullet_supply = supply.Bullet_Supply(bg_size)
     bomb_supply = supply.Bomb_Supply(bg_size)
+    life_supply = supply.Life_Supply(bg_size)
 
     SUPPLY_TIME = USEREVENT
     pygame.time.set_timer(SUPPLY_TIME,30*1000)
@@ -226,10 +227,16 @@ def main():
                                 each.active = False
             elif event.type == SUPPLY_TIME:
                 supply_sound.play()
-                if choice([True,False]):
+                choice1 = choice([1,2,3])
+                if choice1 == 1:
                     bomb_supply.reset()
-                else:
+                elif choice1 == 2:
                     bullet_supply.reset()
+                else:
+                    life_supply.reset()
+                choice1 =0
+                    
+                
             elif event.type == DOUBLE_BULLET_TIME:
                 is_double_bullet = False
                 pygame.time.set_timer(DOUBLE_BULLET_TIME,0)
@@ -321,6 +328,18 @@ def main():
                     pygame.time.set_timer(DOUBLE_BULLET_TIME,18*1000)
                     
                     bullet_supply.active = False
+
+            #绘制生命补给并检测是否获得        
+            if life_supply.active:
+                life_supply.move()
+                screen.blit(life_supply.image,life_supply.rect)
+
+                if pygame.sprite.collide_mask(life_supply,me):
+                    get_bullet_sound.play()
+                    if life_num < 7:
+                        life_num +=1
+                    life_supply.active = False
+                    
             
 
             #发射子弹
@@ -487,6 +506,7 @@ def main():
                     if me_destroy_index == 0:
                         life_num -=1
                         me.reset()
+                        bomb_num = 3
                         pygame.time.set_timer(INVINCIBLE_TIME,3*1000)
             
                 
